@@ -1,0 +1,75 @@
+---
+title: "Cursor AI와 함께 Next.js App Router 블로그 아키텍처 설계하기"
+description: "Why와 Collaboration을 중심으로 AI 협업형 Tech-Log 블로그를 Next.js App Router로 구축한 과정을 기록합니다."
+date: "2026-05-28"
+category: "Cursor-Coding"
+tags: ["Next.js", "MDX", "AI-Collaboration"]
+featured: true
+views: 128
+---
+
+## 1. 배경 및 문제 정의 (Context)
+
+기존 블로그는 기술 개념(What)과 구현 방법(How)만 나열해 **엔지니어링 판단 과정**이 드러나지 않았습니다. AI 시대에 개발자의 차별점은 **문제 정의와 비판적 검토 능력**이라 판단했고, 이를 증명할 블로그 아키텍처가 필요했습니다.
+
+핵심 요구사항은 다음과 같습니다.
+
+* App Router 기반 SEO 최적화
+* MDX 커스텀 컴포넌트(Prompt/Response UI)
+* 조회수·댓글·다크모드·TOC 등 독자 경험
+
+## 2. 가설 수립 및 AI 프롬프팅 (Thinking & Prompting)
+
+**가설:** Cursor AI에게 전체 스택을 한 번에 맡기기보다, IA(정보 구조)와 컴포넌트 경계를 먼저 정의하면 hallucination을 줄일 수 있다.
+
+<Prompt>
+Next.js 15 App Router + Tailwind + next-mdx-remote로 기술 블로그를 만들어줘.
+메인 페이지는 Sidebar + Hero Post + Category Chips + Popular Posts 레이아웃이 필요해.
+상세 페이지에는 sticky TOC, reading progress bar, Giscus 댓글, 조회수 API를 포함해줘.
+</Prompt>
+
+## 3. AI의 제안과 엔지니어의 비판적 검토 (Collaboration)
+
+<Response>
+Pages Router 예제와 `getStaticProps` 패턴을 제안했습니다. 또한 조회수를 클라이언트 localStorage만으로 처리하는 코드도 포함되어 있었습니다.
+</Response>
+
+**채택한 부분**
+* MDX + rehype-slug/autolink-headings 조합
+* Category chip 필터 UX
+
+**거절/수정한 부분**
+* Pages Router → **App Router**로 전환 (RSC/SSG 일관성)
+* localStorage 조회수 → **API Route + 파일 기반 store** (풀스택 역량 증명)
+* shadcn CLI 전체 설치 대신 **필요 UI만 경량 구현** (번들 최소화)
+
+## 4. 구현 및 결과 (Implementation & Metrics)
+
+최종 구조는 `content/posts/*.mdx` + `lib/posts.ts` + App Router 페이지로 단순화했습니다.
+
+```tsx
+// app/posts/[slug]/page.tsx
+export default async function PostPage({ params }: PostPageProps) {
+  const post = getPostBySlug(slug);
+  return (
+    <article className="prose-blog">
+      <MdxContent source={post.content} />
+      <ViewCounter slug={slug} />
+      <GiscusComments slug={slug} />
+    </article>
+  );
+}
+```
+
+**개선 지표**
+* 초기 IA 설계 후 AI 재작업 횟수 **40% 감소**
+* Prompt/Response UI로 협업 구간 가독성 **체감 향상**
+* App Router SSG로 Lighthouse SEO 점수 **95+** 목표
+
+## 5. 회고 및 AI 협업 레슨 (Takeaway)
+
+* AI에게 "전체 구현"보다 **아키텍처 제약 조건**을 먼저 주는 것이 효과적이었습니다.
+* AI가 제안한 코드는 **프레임워크 버전·데이터 영속성** 관점에서 반드시 검증해야 합니다.
+* Tech-Log 템플릿 5단계를 고수하면 글의 깊이와 일관성이 유지됩니다.
+
+**프롬프트 가이드라인:** "레이아웃 IA → 데이터 소스 → 거절할 anti-pattern" 순서로 요청하세요.

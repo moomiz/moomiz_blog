@@ -1,0 +1,49 @@
+---
+title: "MDX Prompt/Response UI로 AI 협업 구간을 시각화하기"
+description: "일반 코드 블록과 구분되는 Prompt/Response 컴포넌트를 MDX에 삽입해 Collaboration 섹션 가독성을 높인 사례입니다."
+date: "2026-05-20"
+category: "Frontend"
+tags: ["MDX", "React", "UX"]
+featured: false
+views: 86
+---
+
+## 1. 배경 및 문제 정의 (Context)
+
+Tech-Log의 핵심인 **Collaboration** 구간이 일반 인용문/코드블록과 시각적으로 구분되지 않아 독자가 AI 대화 맥락을 놓치는 문제가 있었습니다.
+
+## 2. 가설 수립 및 AI 프롬프팅 (Thinking & Prompting)
+
+<Prompt>
+MDX 본문에서 Prompt와 Response를 각각 라이트 블루/그레이 톤 카드로 감싸는 React 컴포넌트를 만들어줘.
+next-mdx-remote RSC에서 사용할 수 있어야 해.
+</Prompt>
+
+## 3. AI의 제안과 엔지니어의 비판적 검토 (Collaboration)
+
+<Response>
+blockquote + emoji prefix만 사용하는 마크다운 확장을 제안했습니다.
+</Response>
+
+**수정 이유:** blockquote는 스타일 확장성이 낮고, 다크모드 토큰과의 일관성이 떨어집니다. **전용 React 컴포넌트**로 대체했습니다.
+
+```tsx
+export function PromptBlock({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="rounded-xl border bg-prompt text-prompt-foreground">
+      <div className="border-b px-4 py-2">내가 던진 프롬프트 💬</div>
+      <div className="px-4 py-4">{children}</div>
+    </div>
+  );
+}
+```
+
+## 4. 구현 및 결과 (Implementation & Metrics)
+
+* MDX에서 `<Prompt>` / `<Response>` 태그로 협업 구간 표현
+* CSS 변수 기반 light/dark 토큰 공유
+* Collaboration 섹션 체류 시간 **예상 20%↑**
+
+## 5. 회고 및 AI 협업 레슨 (Takeaway)
+
+UI 차별화는 "멋진 컴포넌트"보다 **독자의 인지 부하 감소**에 초점을 맞춰야 합니다.

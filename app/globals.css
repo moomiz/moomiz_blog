@@ -1,0 +1,141 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-prompt: var(--prompt);
+  --color-prompt-foreground: var(--prompt-foreground);
+  --color-response: var(--response);
+  --color-response-foreground: var(--response-foreground);
+  --font-sans: var(--font-pretendard);
+  --font-mono: var(--font-jetbrains);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --background: #fafafa;
+  --foreground: #171717;
+  --card: #ffffff;
+  --card-foreground: #171717;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --border: #e4e4e7;
+  --primary: #2563eb;
+  --primary-foreground: #fafafa;
+  --accent: #f4f4f5;
+  --accent-foreground: #18181b;
+  --prompt: #eff6ff;
+  --prompt-foreground: #1e3a8a;
+  --response: #f4f4f5;
+  --response-foreground: #27272a;
+  --radius: 0.625rem;
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #fafafa;
+  --card: #141414;
+  --card-foreground: #fafafa;
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa;
+  --border: #27272a;
+  --primary: #3b82f6;
+  --primary-foreground: #fafafa;
+  --accent: #27272a;
+  --accent-foreground: #fafafa;
+  --prompt: #172554;
+  --prompt-foreground: #bfdbfe;
+  --response: #27272a;
+  --response-foreground: #e4e4e7;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    line-height: 1.65;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply scroll-mt-24 font-semibold tracking-tight;
+  }
+}
+
+@layer utilities {
+  .prose-blog {
+    @apply text-[1.0625rem] leading-[1.7] text-foreground;
+  }
+
+  .prose-blog h1 {
+    @apply mb-6 mt-10 text-3xl;
+  }
+
+  .prose-blog h2 {
+    @apply mb-4 mt-10 border-b border-border pb-2 text-2xl;
+  }
+
+  .prose-blog h3 {
+    @apply mb-3 mt-8 text-xl;
+  }
+
+  .prose-blog p {
+    @apply mb-5;
+  }
+
+  .prose-blog ul,
+  .prose-blog ol {
+    @apply mb-5 ml-6 space-y-2;
+  }
+
+  .prose-blog ul {
+    @apply list-disc;
+  }
+
+  .prose-blog ol {
+    @apply list-decimal;
+  }
+
+  .prose-blog a {
+    @apply text-primary underline-offset-4 hover:underline;
+  }
+
+  .prose-blog blockquote {
+    @apply my-6 border-l-4 border-primary/40 pl-4 italic text-muted-foreground;
+  }
+
+  .prose-blog pre {
+    @apply my-6 overflow-x-auto rounded-lg border border-border bg-muted p-4 font-mono text-sm;
+  }
+
+  .prose-blog code {
+    @apply rounded bg-muted px-1.5 py-0.5 font-mono text-[0.9em];
+  }
+
+  .prose-blog pre code {
+    @apply bg-transparent p-0;
+  }
+
+  .prose-blog strong {
+    @apply font-semibold text-foreground;
+  }
+}

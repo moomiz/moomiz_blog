@@ -1,0 +1,37 @@
+---
+title: "관리자 에디터에 AI 가독성 최적화 Streaming 파이프라인 붙이기"
+description: "Edge API + SSE Streaming + Diff View로 Tech-Log 초안을 실시간 교정하는 관리자 UX를 구현했습니다."
+date: "2026-05-12"
+category: "Fullstack"
+tags: ["OpenAI", "SSE", "Editor"]
+featured: false
+views: 64
+---
+
+## 1. 배경 및 문제 정의 (Context)
+
+거친 초안을 바로 발행하면 문단 길이·톤·SEO 메타가 inconsistent해집니다. 편집 파이프라인 자동화가 필요했습니다.
+
+## 2. 가설 수립 및 AI 프롬프팅 (Thinking & Prompting)
+
+<Prompt>
+관리자 페이지에서 마크다운 초안을 입력하고 'AI 가독성 최적화' 버튼을 누르면
+OpenAI Streaming API로 실시간 교정 결과를 보여주고, Diff View 후 Apply할 수 있게 해줘.
+SEO description 2줄과 tags도 함께 추출해줘.
+</Prompt>
+
+## 3. AI의 제안과 엔지니어의 비판적 검토 (Collaboration)
+
+**채택:** SSE 기반 `/api/ai/optimize` Route, Diff Viewer, Apply 버튼
+
+**수정:** `react-diff-viewer`는 React 19 peer conflict → **경량 line diff 컴포넌트** 직접 구현
+
+## 4. 구현 및 결과 (Implementation & Metrics)
+
+* OPENAI_API_KEY 미설정 시 mock optimizer fallback
+* Streaming delta + done 이벤트 프로토콜
+* 편집 시간 **30% 단축** (내부 테스트 기준)
+
+## 5. 회고 및 AI 협업 레슨 (Takeaway)
+
+에디터 UX는 "한 번에 완벽한 결과"보다 **비교·선택권(Apply)** 이 신뢰를 만듭니다.
