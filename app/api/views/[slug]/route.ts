@@ -7,11 +7,12 @@ type RouteContext = {
 
 export async function GET(_request: NextRequest, context: RouteContext) {
   const { slug } = await context.params;
-  return NextResponse.json({ views: getViewCount(slug) });
+  const views = await getViewCount(slug);
+  return NextResponse.json({ views });
 }
 
 export async function POST(_request: NextRequest, context: RouteContext) {
   const { slug } = await context.params;
-  const views = incrementViewCount(slug);
+  const views = await incrementViewCount(slug);
   return NextResponse.json({ views });
 }

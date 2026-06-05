@@ -8,23 +8,26 @@ import { TableOfContents } from "@/components/TableOfContents";
 import { ViewCounter } from "@/components/ViewCounter";
 import { GiscusComments } from "@/components/GiscusComments";
 import { Badge } from "@/components/ui";
-import { getAllPosts, getPostBySlug } from "@/lib/posts";
+import { getPostBySlug, getPublishedSlugs } from "@/lib/posts";
 import { getViewCount } from "@/lib/views";
 import { formatDate } from "@/lib/utils";
+
+export const revalidate = 60;
 
 type PostPageProps = {
   params: Promise<{ slug: string }>;
 };
 
 export async function generateStaticParams() {
-  return getAllPosts().map((post) => ({ slug: post.slug }));
+  const slugs = await getPublishedSlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
   params,
 }: PostPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const post = await getPostBySlug(slug);
   if (!post) return { title: "글을 찾을 수 없음" };
 
   return {
@@ -36,10 +39,10 @@ export async function generateMetadata({
 
 export default async function PostPage({ params }: PostPageProps) {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const post = await getPostBySlug(slug);
   if (!post) notFound();
 
-  const views = getViewCount(slug);
+  const views = await getViewCount(slug);
 
   return (
     <>

@@ -3,7 +3,8 @@ import { Sidebar } from "@/components/Sidebar";
 import { PostCard } from "@/components/PostCard";
 import { CategoryChips } from "@/components/CategoryChips";
 import { getAllPosts, getCategories, searchPosts } from "@/lib/posts";
-import { mergeViewsWithPosts } from "@/lib/views";
+
+export const revalidate = 60;
 
 type PostsPageProps = {
   searchParams: Promise<{ q?: string; category?: string }>;
@@ -14,13 +15,12 @@ export default async function PostsPage({ searchParams }: PostsPageProps) {
   const query = params.q ?? "";
   const category = params.category ?? "All";
 
-  let posts = query ? searchPosts(query) : getAllPosts();
+  let posts = query ? await searchPosts(query) : await getAllPosts();
   if (category !== "All") {
     posts = posts.filter((post) => post.category === category);
   }
 
-  posts = mergeViewsWithPosts(posts);
-  const categories = getCategories();
+  const categories = await getCategories();
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">

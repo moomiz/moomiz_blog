@@ -1,12 +1,13 @@
 import { Sidebar } from "@/components/Sidebar";
 import { Card } from "@/components/ui";
 import { getAllPosts, getCategories } from "@/lib/posts";
-import { mergeViewsWithPosts } from "@/lib/views";
 import Link from "next/link";
 
-export default function CategoriesPage() {
-  const categories = getCategories().filter((c) => c !== "All");
-  const posts = mergeViewsWithPosts(getAllPosts());
+export const revalidate = 60;
+
+export default async function CategoriesPage() {
+  const categories = (await getCategories()).filter((c) => c !== "All");
+  const posts = await getAllPosts();
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">

@@ -1,64 +1,82 @@
 # Moomiz Tech Log
 
-`blog_specification.md` 기획서를 바탕으로 구현한 **AI 협업형 풀스택 기술 블로그**입니다.
+AI 협업형 풀스택 기술 블로그 — **Supabase(Postgres)** 에 글·초안·조회수를 저장하고, 관리자에서 CRUD + AI 편집을 수행합니다.
 
 ## Tech Stack
 
-- **Framework:** Next.js 15 (App Router)
-- **Styling:** Tailwind CSS v4 + 경량 UI 컴포넌트
-- **Content:** MDX (`next-mdx-remote`) + `gray-matter`
-- **Comments:** Giscus (GitHub Discussions)
-- **Metrics:** 파일 기반 조회수 API (`.data/views.json`)
+| 영역 | 기술 |
+|------|------|
+| Framework | Next.js 15 (App Router) |
+| Database | **Supabase (Postgres)** |
+| Auth | Supabase Auth (관리자) |
+| Content | MDX 본문 + DB 저장 |
+| Comments | Giscus |
+| Styling | Tailwind CSS v4 |
 
-## Getting Started
+## Quick Start
+
+### 1. Supabase 프로젝트 생성
+
+1. [supabase.com](https://supabase.com)에서 프로젝트 생성
+2. SQL Editor에서 `supabase/schema.sql` 실행
+3. **Authentication → Users**에서 관리자 계정 생성 (Email + Password)
+
+### 2. 환경 변수
+
+```bash
+cp .env.example .env.local
+```
+
+`.env.local`에 URL, Anon Key, Service Role Key 입력 (Settings → API).
+
+### 3. 기존 MDX 글 DB로 이전
 
 ```bash
 npm install
+npm run db:seed
+```
+
+### 4. 실행
+
+```bash
 npm run dev
 ```
 
-브라우저에서 [http://localhost:3000](http://localhost:3000) 을 엽니다.
+- 블로그: http://localhost:3000
+- 관리자: http://localhost:3000/admin/login → 글 목록 / 작성 / 발행
 
-## Environment Variables
-
-`.env.example`을 참고해 `.env.local`을 생성하세요.
-
-| Variable | Description |
-|----------|-------------|
-| `OPENAI_API_KEY` | AI 가독성 최적화 (선택, 없으면 mock 모드) |
-| `NEXT_PUBLIC_GISCUS_*` | Giscus 댓글 설정 |
-
-## Project Structure
+## 아키텍처
 
 ```
-app/                 # App Router pages & API routes
-components/          # UI, MDX, admin components
-content/posts/       # MDX blog posts
-lib/                 # posts, views utilities
+방문자 → Next.js (SSR/ISR) → Supabase (posts, view_count)
+관리자 → Supabase Auth → /admin/posts → API → posts 테이블
 ```
 
-## Features
+### `posts` 테이블
 
-- 메인: Sidebar 프로필, Hero Post, Category Chips, 인기 글
-- 상세: TOC(sticky), Reading Progress, 조회수, Giscus
-- MDX: `<Prompt>`, `<Response>` 협업 UI 컴포넌트
-- 관리자(`/admin`): AI Streaming 최적화 + Diff View + Apply
+| 컬럼 | 설명 |
+|------|------|
+| slug | URL 식별자 |
+| title, description, content | 글 메타·본문 (MDX) |
+| category, tags | 분류 |
+| status | `draft` \| `published` |
+| featured | 메인 Hero 노출 |
+| view_count | 조회수 |
 
-## Adding a Post
+RLS: 익명은 **발행 글만 읽기**, 로그인 사용자는 **전체 CRUD**.
 
-`content/posts/your-slug.mdx` 파일을 추가하고 frontmatter를 작성합니다.
+## Supabase 없이 로컬만
 
-```mdx
----
-title: "글 제목"
-description: "2줄 요약"
-date: "2026-06-01"
-category: "Frontend"
-tags: ["React", "Next.js"]
-featured: false
----
-```
+환경 변수가 없으면 `content/posts/*.mdx` 파일 모드로 동작합니다 (관리자 CRUD는 비활성).
+
+## Scripts
+
+| 명령 | 설명 |
+|------|------|
+| `npm run dev` | 개발 서버 |
+| `npm run build` | 프로덕션 빌드 |
+| `npm run db:seed` | MDX → Supabase upsert |
 
 ## Deploy
 
-Vercel 등 Node.js 호스팅에 배포 가능합니다. 조회수 store는 `.data/` 디렉터리에 저장되므로, 프로덕션에서는 Supabase/Upstash로 교체하는 것을 권장합니다.
+Vercel + Supabase 조합 권장. Vercel에 동일한 env 변수를 등록하세요.
