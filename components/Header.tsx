@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { Search } from "lucide-react";
+import { NavLink } from "@/components/NavLink";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Input } from "@/components/ui";
 import { cn } from "@/lib/utils";
@@ -12,7 +13,7 @@ const navItems = [
   { href: "/about", label: "소개" },
   { href: "/posts", label: "글 목록" },
   { href: "/categories", label: "카테고리" },
-  { href: "/admin", label: "관리자" },
+  { href: "/admin", label: "관리자", match: "prefix" as const },
 ];
 
 export function Header({ className }: { className?: string }) {
@@ -28,27 +29,28 @@ export function Header({ className }: { className?: string }) {
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 border-b border-border/80 bg-background/80 backdrop-blur-md",
+        "sticky top-0 z-50 border-b border-border/60 bg-card/75 backdrop-blur-md",
         className
       )}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex shrink-0 items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground">
-            M
+        <Link href="/" className="flex shrink-0 items-center gap-2.5">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-lg">
+            💻
           </div>
-          <span className="hidden font-semibold sm:inline">Moomiz Tech Log</span>
+          <span className="hidden font-semibold text-foreground sm:inline">
+            Moomiz Tech Log
+          </span>
         </Link>
 
-        <nav className="hidden items-center gap-1 md:flex">
+        <nav className="hidden items-center md:flex">
           {navItems.map((item) => (
-            <Link
+            <NavLink
               key={item.href}
               href={item.href}
-              className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-            >
-              {item.label}
-            </Link>
+              label={item.label}
+              match={item.match}
+            />
           ))}
         </nav>
 
@@ -59,7 +61,7 @@ export function Header({ className }: { className?: string }) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="검색..."
-              className="w-44 pl-9 lg:w-56"
+              className="w-44 border-border/80 bg-background/80 pl-9 lg:w-56"
             />
           </form>
           <ThemeToggle />

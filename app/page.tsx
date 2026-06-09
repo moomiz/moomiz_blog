@@ -2,8 +2,8 @@ import { Sidebar } from "@/components/Sidebar";
 import { HeroPost } from "@/components/HeroPost";
 import { PostListCard } from "@/components/PostListCard";
 import { Pagination } from "@/components/Pagination";
-import { CategoryCards } from "@/components/CategoryCards";
 import { LatestComments } from "@/components/LatestComments";
+import { EmptyState } from "@/components/EmptyState";
 import {
   getCategoryStats,
   getHeroPost,
@@ -32,8 +32,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       <div className="space-y-10">
         {hero && <HeroPost post={hero} />}
 
-        <div className="grid gap-x-8 lg:grid-cols-[1fr_280px]">
-          <h2 className="mb-5 text-lg font-semibold lg:col-start-1 lg:row-start-1">
+        <div className="grid gap-x-12 lg:grid-cols-[1fr_280px]">
+          <h2 className="mb-5 text-lg font-semibold text-foreground lg:col-start-1 lg:row-start-1">
             최근 글
           </h2>
 
@@ -46,19 +46,19 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               </div>
 
               {posts.length === 0 && (
-                <p className="py-10 text-center text-muted-foreground">
-                  표시할 글이 없습니다.
-                </p>
+                <EmptyState
+                  emoji="🐈"
+                  title="아직 준비된 글이 없어요"
+                  description="열심히 작성 중이니 조금만 기다려주세요!"
+                />
               )}
 
               <Pagination currentPage={currentPage} totalPages={totalPages} />
             </section>
-
-            <CategoryCards categories={categoryStats} />
           </div>
 
           <aside className="mt-10 space-y-6 lg:col-start-2 lg:row-start-2 lg:mt-0 lg:sticky lg:top-24 lg:self-start">
-            <Sidebar />
+            <Sidebar categories={categoryStats} />
             <LatestComments />
           </aside>
         </div>

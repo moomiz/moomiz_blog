@@ -27,40 +27,40 @@
 }
 
 :root {
-  --background: #fafafa;
-  --foreground: #171717;
-  --card: #ffffff;
-  --card-foreground: #171717;
-  --muted: #f4f4f5;
-  --muted-foreground: #71717a;
-  --border: #e4e4e7;
-  --primary: #2563eb;
-  --primary-foreground: #fafafa;
-  --accent: #f4f4f5;
-  --accent-foreground: #18181b;
-  --prompt: #eff6ff;
-  --prompt-foreground: #1e3a8a;
-  --response: #f4f4f5;
-  --response-foreground: #27272a;
-  --radius: 0.625rem;
+  --background: #f7f5f0;
+  --foreground: #1e293b;
+  --card: #fffcf7;
+  --card-foreground: #1e293b;
+  --muted: #ede9e0;
+  --muted-foreground: #64748b;
+  --border: #e2ddd3;
+  --primary: #5c5348;
+  --primary-foreground: #faf8f4;
+  --accent: #ede9e0;
+  --accent-foreground: #1e293b;
+  --prompt: #f0ebe3;
+  --prompt-foreground: #44403c;
+  --response: #ede9e0;
+  --response-foreground: #334155;
+  --radius: 0.75rem;
 }
 
 .dark {
-  --background: #0a0a0a;
-  --foreground: #fafafa;
-  --card: #141414;
-  --card-foreground: #fafafa;
-  --muted: #27272a;
-  --muted-foreground: #a1a1aa;
-  --border: #27272a;
-  --primary: #3b82f6;
-  --primary-foreground: #fafafa;
-  --accent: #27272a;
-  --accent-foreground: #fafafa;
-  --prompt: #172554;
-  --prompt-foreground: #bfdbfe;
-  --response: #27272a;
-  --response-foreground: #e4e4e7;
+  --background: #141210;
+  --foreground: #f1f5f9;
+  --card: #1c1a17;
+  --card-foreground: #f1f5f9;
+  --muted: #2a2722;
+  --muted-foreground: #94a3b8;
+  --border: #2f2b25;
+  --primary: #d4c4a8;
+  --primary-foreground: #141210;
+  --accent: #2a2722;
+  --accent-foreground: #f1f5f9;
+  --prompt: #252219;
+  --prompt-foreground: #e2e8f0;
+  --response: #2a2722;
+  --response-foreground: #cbd5e1;
 }
 
 @layer base {
@@ -137,5 +137,9 @@
 
   .prose-blog strong {
     @apply font-semibold text-foreground;
+  }
+
+  .card-craft {
+    @apply rounded-2xl border border-border/60 bg-card shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-md;
   }
 }
