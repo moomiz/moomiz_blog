@@ -13,22 +13,22 @@ const components = {
   pre: MdxPre,
 };
 
-export function MdxContent({ source }: { source: string }) {
-  return (
-    <MDXRemote
-      source={source}
-      components={components}
-      options={{
-        mdxOptions: {
-          remarkPlugins: [remarkGfm],
-          rehypePlugins: [
-            rehypeSlug,
-            [rehypeAutolinkHeadings, { behavior: "wrap" }],
-          ],
-        },
-      }}
-    />
-  );
+export async function MdxContent({ source }: { source: string }) {
+  return MDXRemote({
+    source,
+    components,
+    options: {
+      blockJS: true,
+      blockDangerousJS: true,
+      mdxOptions: {
+        remarkPlugins: [remarkGfm],
+        rehypePlugins: [
+          rehypeSlug,
+          [rehypeAutolinkHeadings, { behavior: "wrap" }],
+        ],
+      },
+    },
+  });
 }
 
 export type { MDXRemoteProps };
