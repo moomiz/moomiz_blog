@@ -1,5 +1,6 @@
 import { parseAiMetaBlock } from "@/lib/ai/parseMeta";
 import { OPTIMIZE_SYSTEM_PROMPT } from "@/lib/ai/prompts";
+import { logAiOutput } from "@/lib/ai/logAiOutput";
 import { jsonAiResult, streamOpenAIChat } from "@/lib/ai/openaiStream";
 
 function mockOptimize(content: string) {
@@ -35,6 +36,7 @@ export async function POST(request: Request) {
 
   if (!process.env.OPENAI_API_KEY) {
     const result = mockOptimize(content);
+    logAiOutput("최적화 (mock)", result);
     return Response.json({
       optimized: result.body,
       description: result.description,
@@ -46,13 +48,17 @@ export async function POST(request: Request) {
     const response = await streamOpenAIChat(
       OPTIMIZE_SYSTEM_PROMPT,
       content,
-      { onDelta: () => undefined, onDone: () => undefined },
+      {
+        onDelta: () => undefined,
+        onDone: (result) => logAiOutput("최적화", result),
+      },
       0.4
     );
 
     return response;
   } catch {
     const result = mockOptimize(content);
+    logAiOutput("최적화 (fallback mock)", result);
     return Response.json({
       optimized: result.body,
       description: result.description,

@@ -1,4 +1,5 @@
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { mergeCategories } from "@/lib/admin/categories";
 import type { Post, PostMeta } from "@/lib/types/post";
 import * as db from "./db";
 import * as mdx from "./mdx";
@@ -38,6 +39,14 @@ export async function getPostByIdAdmin(id: string): Promise<Post | null> {
 export async function getCategories(): Promise<string[]> {
   const posts = await getAllPosts();
   return ["All", ...Array.from(new Set(posts.map((p) => p.category)))];
+}
+
+export async function getAdminCategories(): Promise<string[]> {
+  if (!isSupabaseConfigured()) {
+    return mergeCategories([]);
+  }
+  const posts = await getAllPostsAdmin();
+  return mergeCategories(posts.map((post) => post.category));
 }
 
 export type CategoryStat = { name: string; count: number };

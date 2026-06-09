@@ -62,4 +62,18 @@ export async function consumeAiStream(
       }
     }
   }
+
+  buffer += decoder.decode();
+  if (buffer.trim()) {
+    const line = buffer.replace(/^data: /, "").trim();
+    if (line) {
+      const payload = JSON.parse(line) as AiDeltaPayload | AiDonePayload;
+      if (payload.type === "delta") {
+        handlers.onDelta(payload.delta);
+      }
+      if (payload.type === "done") {
+        handlers.onDone(payload);
+      }
+    }
+  }
 }

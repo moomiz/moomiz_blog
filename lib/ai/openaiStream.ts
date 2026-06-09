@@ -1,5 +1,11 @@
 import { parseAiMetaBlock, type AiMetaResult } from "./parseMeta";
 
+export const DEFAULT_OPENAI_MODEL = "gpt-5.4-mini";
+
+export function getOpenAIModel() {
+  return process.env.OPENAI_MODEL?.trim() || DEFAULT_OPENAI_MODEL;
+}
+
 type StreamHandlers = {
   onDelta: (delta: string) => void;
   onDone: (result: AiMetaResult) => void;
@@ -23,7 +29,7 @@ export async function streamOpenAIChat(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "gpt-4o-mini",
+      model: getOpenAIModel(),
       stream: true,
       messages: [
         { role: "system", content: systemPrompt },
@@ -40,6 +46,32 @@ export async function streamOpenAIChat(
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
   let fullText = "";
+  let sseLineBuffer = "";
+
+  const processSseLine = (line: string, controller: ReadableStreamDefaultController) => {
+    if (!line.startsWith("data: ")) return;
+
+    const payload = line.slice("data: ".length).trim();
+    if (!payload || payload === "[DONE]") return;
+
+    try {
+      const parsed = JSON.parse(payload) as {
+        choices?: Array<{ delta?: { content?: string } }>;
+      };
+      const delta = parsed.choices?.[0]?.delta?.content ?? "";
+      if (!delta) return;
+
+      fullText += delta;
+      handlers.onDelta(delta);
+      controller.enqueue(
+        encoder.encode(
+          `data: ${JSON.stringify({ type: "delta", delta })}\n\n`
+        )
+      );
+    } catch {
+      // ignore malformed SSE JSON
+    }
+  };
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -50,33 +82,18 @@ export async function streamOpenAIChat(
           const { done, value } = await reader.read();
           if (done) break;
 
-          const chunk = decoder.decode(value);
-          const lines = chunk
-            .split("\n")
-            .filter((line) => line.startsWith("data: "));
+          sseLineBuffer += decoder.decode(value, { stream: true });
+          const lines = sseLineBuffer.split("\n");
+          sseLineBuffer = lines.pop() ?? "";
 
           for (const line of lines) {
-            const payload = line.replace("data: ", "").trim();
-            if (payload === "[DONE]") continue;
-
-            try {
-              const parsed = JSON.parse(payload) as {
-                choices?: Array<{ delta?: { content?: string } }>;
-              };
-              const delta = parsed.choices?.[0]?.delta?.content ?? "";
-              if (delta) {
-                fullText += delta;
-                handlers.onDelta(delta);
-                controller.enqueue(
-                  encoder.encode(
-                    `data: ${JSON.stringify({ type: "delta", delta })}\n\n`
-                  )
-                );
-              }
-            } catch {
-              // ignore malformed SSE chunks
-            }
+            processSseLine(line, controller);
           }
+        }
+
+        sseLineBuffer += decoder.decode();
+        if (sseLineBuffer.trim()) {
+          processSseLine(sseLineBuffer, controller);
         }
 
         const result = parseAiMetaBlock(fullText);

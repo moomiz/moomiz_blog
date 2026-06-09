@@ -4,7 +4,13 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { PromptBlock } from "@/components/mdx/PromptBlock";
 import { ResponseBlock } from "@/components/mdx/ResponseBlock";
-import { parseMdxSegments } from "@/lib/mdx/parseSegments";
+import { MermaidDiagram } from "@/components/mdx/MermaidDiagram";
+import {
+  EDITOR_CONTENT_MIN_HEIGHT,
+  EDITOR_PREVIEW_MAX_HEIGHT,
+} from "@/lib/admin/editor-steps";
+import { splitMarkdownSegments } from "@/lib/mdx/splitMarkdown";
+import { cn } from "@/lib/utils";
 
 function MarkdownBody({ content }: { content: string }) {
   if (!content.trim()) return null;
@@ -14,11 +20,23 @@ function MarkdownBody({ content }: { content: string }) {
   );
 }
 
-export function MarkdownPreview({ source }: { source: string }) {
-  const segments = parseMdxSegments(source);
+type MarkdownPreviewProps = {
+  source: string;
+  className?: string;
+};
+
+export function MarkdownPreview({ source, className }: MarkdownPreviewProps) {
+  const segments = splitMarkdownSegments(source);
 
   return (
-    <div className="prose-blog min-h-[420px] rounded-lg border border-border bg-muted/30 p-4">
+    <div
+      className={cn(
+        "prose-blog overflow-y-auto rounded-lg border border-border bg-muted/30 p-4",
+        EDITOR_CONTENT_MIN_HEIGHT,
+        EDITOR_PREVIEW_MAX_HEIGHT,
+        className
+      )}
+    >
       {segments.map((segment, index) => {
         if (segment.type === "prompt") {
           return (
@@ -34,6 +52,10 @@ export function MarkdownPreview({ source }: { source: string }) {
               <MarkdownBody content={segment.content} />
             </ResponseBlock>
           );
+        }
+
+        if (segment.type === "mermaid") {
+          return <MermaidDiagram key={index} chart={segment.content} />;
         }
 
         return <MarkdownBody key={index} content={segment.content} />;

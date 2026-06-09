@@ -5,10 +5,12 @@ import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { PromptBlock } from "@/components/mdx/PromptBlock";
 import { ResponseBlock } from "@/components/mdx/ResponseBlock";
+import { MdxPre } from "@/components/mdx/MdxPre";
 
 const components = {
   Prompt: PromptBlock,
   Response: ResponseBlock,
+  pre: MdxPre,
 };
 
 export function MdxContent({ source }: { source: string }) {
